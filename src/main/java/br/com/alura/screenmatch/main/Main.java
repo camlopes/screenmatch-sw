@@ -2,10 +2,12 @@ package br.com.alura.screenmatch.main;
 
 import br.com.alura.screenmatch.model.DadosSerie;
 import br.com.alura.screenmatch.model.DadosTemporada;
+import br.com.alura.screenmatch.model.Serie;
 import br.com.alura.screenmatch.service.ConsumoAPI;
 import br.com.alura.screenmatch.service.ConverteDados;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Main {
     private Scanner scanner = new Scanner(System.in);
@@ -13,7 +15,7 @@ public class Main {
     private final String API_KEY = "&apikey=ece4d09a";
     private ConsumoAPI consumoAPI = new ConsumoAPI();
     private ConverteDados conversor = new ConverteDados();
-    private  List<DadosSerie> dadosSeries = new ArrayList<>();
+    private List<DadosSerie> dadosSeries = new ArrayList<>();
 
     public void exibeMenu() {
         var opcao = -1;
@@ -51,7 +53,13 @@ public class Main {
     }
 
     private void listarSeriesBuscadas() {
-        dadosSeries.forEach(System.out::println);
+        List<Serie> series = dadosSeries.stream()
+                .map(s -> new Serie(s))
+                .collect(Collectors.toList());
+
+        series.stream()
+                .sorted(Comparator.comparing(Serie::getGenero))
+                .forEach(System.out::println);
     }
 
     private void buscarSerieWeb() {
