@@ -16,6 +16,7 @@ public class Main {
     private ConverteDados conversor = new ConverteDados();
     private List<Serie> series = new ArrayList<>();
     private SerieRepository repository;
+    private Optional<Serie> serieBuscada;
 
     public Main(SerieRepository repository) {
         this.repository = repository;
@@ -33,6 +34,8 @@ public class Main {
                     6 - Listar as Top 5 series
                     7 - Buscar series por genero
                     8 - Filtrar séries por temporada e avaliação
+                    9 - Buscar episodios por titulo
+                    10 - Listar os Top 5 episodios
                     
                     0 - Sair
                     """;
@@ -66,6 +69,13 @@ public class Main {
                     break;
                 case 8:
                     filtrarSeriesPorTemporadaEAvaliacao();
+                    break;
+                case 9:
+                    buscarEpisodioPorTitulo();
+                    break;
+                case 10:
+                    buscarTop5Episodios();
+                    break;
                 case 0:
                     System.out.println("Saindo...");
                     break;
@@ -98,7 +108,7 @@ public class Main {
         return dados;
     }
 
-    private void buscarEpisodioPorSerie(){
+    private void buscarEpisodioPorSerie() {
         listarSeriesBuscadas();
         System.out.print("Escolha uma serie pelo nome: ");
         var nomeSerie = scanner.nextLine();
@@ -130,9 +140,9 @@ public class Main {
     private void buscarSeriePorTitulo() {
         System.out.print("Escolha uma serie pelo nome: ");
         var nomeSerie = scanner.nextLine();
-        Optional<Serie> serieBuscada = repository.findByTituloContainingIgnoreCase(nomeSerie);
+        serieBuscada = repository.findByTituloContainingIgnoreCase(nomeSerie);
 
-        if (serieBuscada.isPresent()){
+        if (serieBuscada.isPresent()) {
             System.out.println("Dados da serie: " + serieBuscada.get());
 
         } else {
@@ -169,16 +179,39 @@ public class Main {
         seriesPorGenero.forEach(System.out::println);
     }
 
-    private void filtrarSeriesPorTemporadaEAvaliacao(){
+    private void filtrarSeriesPorTemporadaEAvaliacao() {
         System.out.print("Digite o numero maximo de temporadas que a serie deve possuir: ");
         var totalTemporadas = scanner.nextInt();
         scanner.nextLine();
         System.out.print("Digite o valor da avaliacao que a serie deve possuir: ");
         var avaliacao = scanner.nextDouble();
         scanner.nextLine();
-        List<Serie> filtroSeries = repository.findByTotalTemporadasLessThanEqualAndAvaliacaoGreaterThanEqual(totalTemporadas, avaliacao);
+        List<Serie> filtroSeries = repository.seriesPorTemporadaEAValiacao(totalTemporadas, avaliacao);
         System.out.println("Series encontradas com " + totalTemporadas + " temporadas e avaliacao: " + avaliacao);
         filtroSeries.forEach(s ->
                 System.out.println(s.getTitulo() + "  - avaliação: " + s.getAvaliacao()));
+    }
+
+    private void buscarEpisodioPorTitulo() {
+        System.out.print("Digite um nome de episodio: ");
+        var nomeEpisodio = scanner.nextLine();
+        List<Episodio> episodiosEncontrados = repository.episodioPorNome(nomeEpisodio);
+        episodiosEncontrados.forEach(e ->
+                System.out.printf("Série: %s Temporada %s - Episódio %s - %s\n",
+                        e.getSerie().getTitulo(), e.getTemporada(),
+                        e.getNumeroEpisodio(), e.getTitulo()));
+    }
+
+    private void buscarTop5Episodios() {
+        buscarSeriePorTitulo();
+
+        if(serieBuscada.isPresent()){
+            Serie serie = serieBuscada.get();
+            List<Episodio> topEpisodios = repository.topEpisodiosPorSerie(serie);
+            topEpisodios.forEach(e ->
+                    System.out.printf("Série: %s Temporada %s - Episódio %s - %s Avaliação %s\n",
+                            e.getSerie().getTitulo(), e.getTemporada(),
+                            e.getNumeroEpisodio(), e.getTitulo(), e.getAvaliacao() ));
+        }
     }
 }
