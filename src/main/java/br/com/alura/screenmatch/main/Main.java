@@ -33,6 +33,7 @@ public class Main {
                     3 - Historico de series buscadas
                     4 - Verificar series ja buscadas
                     5 - Buscar series por ator
+                    6 - Listar as Top 5 series
                     
                     0 - Sair
                     """;
@@ -57,6 +58,9 @@ public class Main {
                     break;
                 case 5:
                     buscarSeriesPorAtor();
+                    break;
+                case 6:
+                    buscarTop5Series();
                     break;
                 case 0:
                     System.out.println("Saindo...");
@@ -142,6 +146,13 @@ public class Main {
 
         System.out.println("Series em que " + nomeAtor + " trabalhou:");
         seriesEncontrada.forEach(s ->
+                System.out.println(s.getTitulo() + " Avaliacao: " + s.getAvaliacao()));
+    }
+
+    private void buscarTop5Series() {
+        List<Serie> seriesTop = repository.findTop5ByOrderByAvaliacaoDesc();
+
+        seriesTop.forEach(s ->
                 System.out.println(s.getTitulo() + " Avaliacao: " + s.getAvaliacao()));
     }
 }
