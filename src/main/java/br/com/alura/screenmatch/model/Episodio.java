@@ -19,6 +19,8 @@ public class Episodio {
     @ManyToOne
     private Serie serie;
 
+    public Episodio() {}
+
     public Episodio(Integer numeroTemporada, DadosEpisodio dasosEpisodio) {
         temporada = numeroTemporada;
         titulo = dasosEpisodio.titulo();
@@ -91,7 +93,7 @@ public class Episodio {
     @Override
     public String toString() {
         return  "temporada=" + temporada +
-                ", titulo='" + titulo + '\'' +
+                ", titulo=" + titulo + '\'' +
                 ", numeroEpisodio=" + numeroEpisodio +
                 ", avaliacao=" + avaliacao +
                 ", dataLancamento=" + dataLancamento;
